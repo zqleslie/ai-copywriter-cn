@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 营销文案生成器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e' },
+            accent: { 50:'#fdf4ff',100:'#fae8ff',200:'#f5d0fe',300:'#f0abfc',400:'#e879f9',500:'#d946ef',600:'#c026d3',700:'#a21caf',800:'#86198f',900:'#701a72' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+    body { font-family: 'Noto Sans SC', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-glow { box-shadow: 0 0 40px rgba(102,126,234,0.15); }
+    .copy-btn:hover { transform: scale(1.05); }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .sparkle { animation: sparkle 2s ease-in-out infinite; }
+    @keyframes sparkle { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.2);} }
+  </style>
+</head>
+<body class="min-h-screen gradient-bg">
+
+  <!-- Header -->
+  <header class="text-center pt-8 pb-4 px-4">
+    <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-5 py-2 mb-4">
+      <span class="text-2xl sparkle">✨</span>
+      <span class="text-white/90 text-sm font-medium">AI 驱动 · 一键生成</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
+      营销文案生成器
+    </h1>
+    <p class="text-white/70 text-lg max-w-md mx-auto">输入产品信息，AI 帮你生成小红书爆款文案 + 朋友圈种草文案</p>
+  </header>
+
+  <!-- Main Card -->
+  <main class="max-w-2xl mx-auto px-4 pb-12">
+    <div class="bg-white rounded-3xl shadow-2xl card-glow p-6 md:p-8 mb-8">
+
+      <!-- Product Name -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">📦 产品名称</label>
+        <input id="productName" type="text" placeholder="例如：小棕瓶精华液"
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 outline-none transition text-gray-800 text-lg">
+      </div>
+
+      <!-- Keywords -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">🏷️ 卖点关键词（用空格或逗号分隔）</label>
+        <textarea id="keywords" rows="2" placeholder="例如：抗老、紧致、淡纹、玻尿酸、天然植物"
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-brand-400 focus:ring-4 focus:ring-brand-100 outline-none transition text-gray-800 resize-none"></textarea>
+      </div>
+
+      <!-- Tone -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">🎨 文案风格</label>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="selectTone(this,'热情种草')" class="tone-btn px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-brand-400 hover:text-brand-600 transition text-sm font-medium">🔥 热情种草</button>
+          <button onclick="selectTone(this,'专业评测')" class="tone-btn px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-brand-400 hover:text-brand-600 transition text-sm font-medium">🔬 专业评测</button>
+          <button onclick="selectTone(this,'情感故事')" class="tone-btn px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-brand-400 hover:text-brand-600 transition text-sm font-medium">💝 情感故事</button>
+          <button onclick="selectTone(this,'幽默搞笑')" class="tone-btn px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-brand-400 hover:text-brand-600 transition text-sm font-medium">😂 幽默搞笑</button>
+          <button onclick="selectTone(this,'高级轻奢')" class="tone-btn px-4 py-2 rounded-full border-2 border-gray-200 text-gray-600 hover:border-brand-400 hover:text-brand-600 transition text-sm font-medium">💎 高级轻奢</button>
+        </div>
+      </div>
+
+      <!-- Generate Button -->
+      <button onclick="generate()" id="genBtn"
+        class="w-full gradient-bg text-white font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 active:translate-y-0">
+        🚀 一键生成文案
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+      <!-- Xiaohongshu -->
+      <div class="mb-6">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-md">小红书</span>
+          爆款文案
+        </h2>
+        <div id="xhsResults" class="space-y-4"></div>
+      </div>
+      <!-- Moments -->
+      <div>
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-md">朋友圈</span>
+          种草文案
+        </h2>
+        <div id="momentsResults" class="space-y-4"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center pb-8 text-white/40 text-sm">
+    Made with ❤️ · 纯前端运行，数据不上传
+  </footer>
+
+<script>
+let currentTone = '热情种草';
+function selectTone(btn, tone) {
+  currentTone = tone;
+  document.querySelectorAll('.tone-btn').forEach(b => {
+    b.classList.remove('bg-brand-500','text-white','border-brand-500');
+    b.classList.add('border-gray-200','text-gray-600');
+  });
+  btn.classList.add('bg-brand-500','text-white','border-brand-500');
+  btn.classList.remove('border-gray-200','text-gray-600');
+}
+// Select first tone by default
+document.querySelector('.tone-btn').click();
+
+// Template system
+const xhsTemplates = {
+  '热情种草': [
+    (p,kw) => `救命！！${p}真的太好用了吧😭\n\n姐妹们，我必须按头安利这个！用了${kw[0]||'它'}之后，效果真的绝了✨\n\n👉 ${kw.slice(0,3).map(k=>`✅ ${k}`).join('\n')}\n\n真的不夸张，用过就回不去了！谁还没用过我真的会伤心的OK？\n\n💰性价比也超高，学生党冲就对了！\n\n#${p} #好物推荐 #种草 #必买清单`,
+    (p,kw) => `🔥 2024必入好物！${p}使用真实感受\n\n家人们谁懂啊！！最近入手了${p}，真的被惊艳到了！！\n\n💡核心亮点：\n${kw.map(k=>`▫️ ${k}`).join('\n')}\n\n用了一周就来分享了，真心觉得好用才推荐的～\n\n姐妹们放心冲，不好用来找我！🙋‍♀️\n\n#${p} #好物分享 #使用感受 #推荐`,
+    (p,kw) => `别再乱买了！${p}才是真正的神器👑\n\n试了这么多，最后还是${p}赢麻了！\n\n🌟 为什么推荐：\n${kw.slice(0,3).map((k,i)=>`${i+1}. ${k}`).join('\n')}\n\n真的是一分钱一分货，用了就知道有多香！\n\n评论区告诉我你们还想看什么测评👇\n\n#${p} #测评 #好物 #种草日记`
+  ],
+  '专业评测': [
+    (p,kw) => `【深度测评】${p}到底值不值得买？\n\n作为一名成分党，我对${p}做了为期28天的实测📊\n\n📋 核心参数：\n${kw.map(k=>`◽ ${k}`).join('\n')}\n\n📈 实测数据：\n使用前 vs 使用后对比明显\n\n🎯 总结：在同价位中性价比突出，${kw[0]||'效果'}方面表现优异。\n\n⚠️ 适合人群：${kw.slice(0,2).join('、')}需求者\n\n#${p} #深度测评 #成分党 #客观评测`,
+    (p,kw) => `🔬 ${p}全方位解析｜不吹不黑\n\n花了${Math.floor(Math.random()*200+100)}块买了${p}，今天给大家做一个硬核测评。\n\n📌 检测维度：\n${kw.map(k=>`▸ ${k}`).join('\n')}\n\n✅ 优点：${kw.slice(0,2).join('、'}表现突出\n⚠️ 注意：建议根据需求选择\n\n综合评分：${(Math.random()*1.5+3.5).toFixed(1)}/5 ⭐\n\n#${p} #测评报告 #选购指南 #真实体验`,
+    (p,kw) => `横评来了！${p} vs 市面主流产品对比\n\n为了选到最好的，我买了5款同类产品做对比📊\n\n${p} 在以下方面胜出：\n${kw.map(k=>`🏆 ${k}`).join('\n')}\n\n📊 综合排名：${['第1名','第2名','第3名'][Math.floor(Math.random()*3)]}\n\n详细对比图在评论区👇\n\n#${p} #横评对比 #选购攻略 #专业测评`
+  ],
+  '情感故事': [
+    (p,kw) => `那年我${kw[0]||'遇到了瓶颈'}，直到遇见了${p}...\n\n说实话，一开始我是不信的。\n\n朋友推荐了${p}，我抱着试试看的心态用了用。\n\n结果...真的改变了我的想法💫\n\n${kw.slice(0,3).map(k=>`✨ ${k}`).join('\n')}\n\n有时候，一个好的选择真的能改变很多。\n\n如果你也在犹豫，我想说：给自己一个机会。\n\n#${p} #真实故事 #改变 #心路历程`,
+    (p,kw) => `写给所有${kw[0]||'正在努力'}的女孩们💌\n\n我知道你很累，我知道你经常怀疑自己。\n\n但我想告诉你，${p}让我明白了：你值得最好的。\n\n💝 它给我的：\n${kw.map(k=>`♥ ${k}`).join('\n')}\n\n生活已经够苦了，对自己好一点不过分吧？\n\n#${p} #写给女孩 #自我宠爱 #情感共鸣`,
+    (p,kw) => `从怀疑到真香，我与${p}的30天📖\n\nDay 1：这真的有用吗？\nDay 7：好像有点效果...\nDay 14：哇，真的不一样了！\nDay 30：离不开它了😭\n\n${p}教会我一件事：好的东西需要时间证明。\n\n${kw.map(k=>`🌱 ${k}`).join('\n')}\n\n感谢那个没有放弃的自己✨\n\n#${p} #30天打卡 #成长日记 #真香警告`
+  ],
+  '幽默搞笑': [
+    (p,kw) => `我靠，${p}是来报恩的吧！！😂\n\n我妈问我为什么最近笑得像个傻子\n\n因为我用了${p}之后真的停不下来啊！！\n\n${kw.map(k=>`🤣 ${k}`).join('\n')}\n\n朋友问我是不是打了什么广告\n\n我说：给钱了我才不说这么好！\n\n结果他们买了之后现在天天追着我要链接🤷‍♀️\n\n#${p} #搞笑日常 #好物推荐 #笑死`,
+    (p,kw) => `警告：使用${p}后可能会发生以下情况⚠️\n\n1. 朋友突然都变成你的推销员\n2. 购物车里全是它家产品\n3. 走在路上被人问链接\n4. 变得太好看被闺蜜拉黑\n\n${p}真的，${kw.slice(0,3).join('、')}，绝了！\n\n我已经"害"了3个闺蜜了，你们自己看着办吧😏\n\n#${p} #搞笑种草 #闺蜜杀手 #好物`,
+    (p,kw) => `${p}：一个让我钱包消瘦的神器💸\n\n不是，它怎么可以这么好用又这么便宜啊！！\n\n我的钱包：求求你放过我\n我：不行，它真的太好用了\n\n${kw.map(k=>`💸 ${k}`).join('\n')}\n\n建议改名叫"钱包刺客"，但我是自愿被刺的🗡️\n\n#${p} #钱包刺客 #搞笑购物 #剁手日常`
+  ],
+  '高级轻奢': [
+    (p,kw) => `𝐏𝐫𝐞𝐬𝐞𝐧𝐭𝐢𝐧𝐠 · ${p}\n\n𝓛𝓾𝔁𝓾𝓻𝔂 𝓲𝓼 𝓷𝓸𝓽 𝓪 𝓹𝓻𝓲𝓬𝓮, 𝓲𝓽'𝓼 𝓪 𝓼𝓽𝓪𝓷𝓭𝓪𝓻𝓭.\n\n在${kw[0]||'品质'}的追求上，我从不妥协。\n\n${p}，是近期最让我心动的心得。\n\n✦ ${kw.slice(0,3).join('\n✦ ')}\n\n𝐓𝐡𝐞 𝐛𝐞𝐬𝐭 𝐢𝐬 𝐰𝐨𝐫𝐭𝐡 𝐰𝐚𝐢𝐭𝐢𝐧𝐠.\n\n#${p} #轻奢生活 #品质之选 #美学`,
+    (p,kw) => `「Less is More」—— 关于${p}的极简哲学\n\n真正的高级，从不需要过多的修饰。\n\n${p}以极简之姿，诠释${kw[0]||'品质'}的真谛。\n\n◈ ${kw.map(k=>`${k}`).join(' · ')}\n\n于细节处见真章。\n\n𝓐 𝓽𝓻𝓾𝓵𝔂 𝓻𝓮𝓯𝓲𝓷𝓮𝓭 𝓬𝓱𝓸𝓲𝓬𝓮.\n\n#${p} #极简主义 #高级感 #生活美学`,
+    (p,kw) => `𝐌𝐲 𝐋𝐢𝐟𝐞𝐬𝐭𝐲𝐥𝐞 · ${p}\n\n有些东西，用过一次就知道是"对"的。\n\n${p}于我而言，就是这样的存在。\n\n▫️ ${kw.join('\n▫️ ')}\n\n不张扬，却有力量。\n不喧哗，自有声量。\n\n𝐒𝐢𝐥𝐞𝐧𝐜𝐞 𝐢𝐬 𝐭𝐡𝐞 𝐛𝐢𝐠𝐠𝐞𝐬𝐭 𝐥𝐮𝐱𝐮𝐫𝐲.\n\n#${p} #生活方式 #轻奢 #质感生活`
+  ]
+};
+
+const momentsTemplates = {
+  '热情种草': [
+    (p,kw) => `刚入手了${p}，真的被惊艳到了！${kw.slice(0,2).join('、')}都超棒，强烈安利给大家！🔥✨`,
+    (p,kw) => `今天必须来夸夸${p}！用了之后${kw[0]||'效果'}明显提升，谁用谁知道～💪`,
+    (p,kw) => `好物分享！${p}真的是近期最爱，${kw.join('、')}，闭眼入不亏！💯`
+  ],
+  '专业评测': [
+    (p,kw) => `实测${p}一周，${kw.slice(0,3).join('、')}表现都不错，给个好评👍 有需要的朋友可以参考。`,
+    (p,kw) => `从专业角度说说${p}：${kw[0]||'品质'}确实在线，细节做工到位，性价比不错。📊`,
+    (p,kw) => `对比了几款，${p}在${kw[0]||'综合表现'}上确实突出，推荐有需要的朋友试试。✅`
+  ],
+  '情感故事': [
+    (p,kw) => `有时候，一件好物真的能提升生活的幸福感。${p}就是这样一份小确幸💕 ${kw[0]||'品质'}生活，从对自己好一点开始。`,
+    (p,kw) => `忙碌的日子里，${p}给了我一份小小的仪式感。生活再忙，也要好好爱自己呀～🌸`,
+    (p,kw) => `收到${p}的那一刻，感觉所有的等待都值得了。好的东西，永远不嫌晚✨`
+  ],
+  '幽默搞笑': [
+    (p,kw) => `买了${p}之后，我的钱包瘦了，但我开心了😂 这买卖值！${kw[0]||'效果'}杠杠的～`,
+    (p,kw) => `警告：不要随便推荐${p}给朋友，因为他们会天天追着你要链接🤣 我已经"害"了好几个人了`,
+    (p,kw) => `${p}：一个让我又爱又恨的东西。爱它好用，恨它让我疯狂剁手💸 但...再来一次我还是会买！`
+  ],
+  '高级轻奢': [
+    (p,kw) => `𝐋𝐢𝐟𝐞𝐬𝐭𝐲𝐥𝐞 · ${p}\n品质生活，不在于拥有多少，而在于拥有多好。\n${kw.slice(0,2).join(' · ')}，足矣。`,
+    (p,kw) => `于细节处见品味。${p}，一份给自己的轻奢礼物🎁 ${kw[0]||'品质'}生活，从此刻开始。`,
+    (p,kw) => `好的生活，不需要太多东西来证明。\n${p}就够了。${kw.join('、')}，刚刚好。✨`
+  ]
+};
+
+function getKeywords() {
+  const raw = document.getElementById('keywords').value;
+  return raw.split(/[,\s，、；;]+/).filter(k => k.trim().length > 0);
+}
+
+function generate() {
+  const productName = document.getElementById('productName').value.trim();
+  const keywords = getKeywords();
+
+  if (!productName) {
+    shakeEl(document.getElementById('productName'));
+    return;
+  }
+  if (keywords.length === 0) {
+    shakeEl(document.getElementById('keywords'));
+    return;
+  }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ 生成中...';
+
+  setTimeout(() => {
+    const tone = currentTone;
+    const xhsTpls = xhsTemplates[tone];
+    const momTpls = momentsTemplates[tone];
+
+    const xhsHtml = xhsTpls.map((tpl, i) => {
+      const text = tpl(productName, keywords);
+      return createResultCard(text, '小红书', i+1, 'red');
+    }).join('');
+
+    const momHtml = momTpls.map((tpl, i) => {
+      const text = tpl(productName, keywords);
+      return createResultCard(text, '朋友圈', i+1, 'green');
+    }).join('');
+
+    document.getElementById('xhsResults').innerHTML = xhsHtml;
+    document.getElementById('momentsResults').innerHTML = momHtml;
+    document.getElementById('results').classList.remove('hidden');
+
+    btn.disabled = false;
+    btn.innerHTML = '🚀 一键生成文案';
+
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 800);
+}
+
+function createResultCard(text, platform, num, color) {
+  const id = 'text-' + Date.now() + '-' + num + '-' + platform;
+  return `
+    <div class="bg-white rounded-2xl p-5 shadow-lg fade-in border-l-4 ${color==='red'?'border-red-400':'border-green-400'}">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-bold ${color==='red'?'text-red-500':'text-green-600'} bg-${color==='red'?'red':'green'}-50 px-3 py-1 rounded-full">${platform} ${num}/3</span>
+        <button onclick="copyText('${id}')" class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition font-medium">
+          📋 复制
+        </button>
+      </div>
+      <div id="${id}" class="text-gray-700 whitespace-pre-line text-sm leading-relaxed">${escapeHtml(text)}</div>
+    </div>`;
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl text-sm z-50 fade-in';
+    toast.textContent = '✅ 已复制到剪贴板';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  });
+}
+
+function shakeEl(el) {
+  el.classList.add('border-red-400','ring-4','ring-red-100');
+  el.animate([
+    {transform:'translateX(0)'},
+    {transform:'translateX(-8px)'},
+    {transform:'translateX(8px)'},
+    {transform:'translateX(-4px)'},
+    {transform:'translateX(0)'}
+  ], {duration:400});
+  setTimeout(() => el.classList.remove('border-red-400','ring-4','ring-red-100'), 2000);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
